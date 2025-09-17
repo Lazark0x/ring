@@ -112,7 +112,7 @@ macro_rules! prefixed_item {
         $name:ident
         { $item:item }
     } => {
-        // #[$attr = concat!(prefix!(), stringify!($name))]
+        #[$attr = concat!(prefix!(), stringify!($name))]
         $item
     };
 }
