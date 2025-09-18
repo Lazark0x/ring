@@ -16,9 +16,8 @@
 #define OPENSSL_HEADER_BASE_H
 
 #if defined(__wasm__)
-#define RING_WASM_HIDDEN __attribute__((visibility("hidden")))
-#else
-#define RING_WASM_HIDDEN
+  #undef bn_mul_mont
+  #define bn_mul_mont __ring_internal_bn_mul_mont
 #endif
 
 // This file should be the first included by all BoringSSL headers.
