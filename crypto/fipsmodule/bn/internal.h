@@ -119,9 +119,9 @@ static inline void bn_mul_mont_small(
     bn_mul_mont_nohw(rp, ap, bp, np, n0, num);
 }
 #else
-RING_WASM_HIDDEN void bn_mul_mont(BN_ULONG *rp, const BN_ULONG *ap, const BN_ULONG *bp,
+void bn_mul_mont(BN_ULONG *rp, const BN_ULONG *ap, const BN_ULONG *bp,
                  const BN_ULONG *np, const BN_ULONG *n0, size_t num);
-RING_WASM_HIDDEN static inline void bn_mul_mont_small(
+static inline void bn_mul_mont_small(
     BN_ULONG *rp, const BN_ULONG *ap, const BN_ULONG *bp,
     const BN_ULONG *np, const BN_ULONG *n0, size_t num) {
     bn_mul_mont(rp, ap, bp, np, n0, num);
