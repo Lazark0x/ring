@@ -15,11 +15,6 @@
 #ifndef OPENSSL_HEADER_BASE_H
 #define OPENSSL_HEADER_BASE_H
 
-#if defined(__wasm__)
-  #undef bn_mul_mont
-  #define bn_mul_mont bn_mul_mont_fallback
-#endif
-
 // This file should be the first included by all BoringSSL headers.
 
 #if defined(_MSC_VER) && !defined(__clang__)
