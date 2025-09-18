@@ -182,7 +182,7 @@ pub(super) fn limbs_mul_mont(
             // FFI wrapper defined below, so that Rust and C code both go
             // through `bn_mul_mont`.
             bn_mul_mont_ffi!(in_out, n, n0, cpu, unsafe {
-                (MIN_LIMBS, MOD_FALLBACK, cpu::Features) => bn_mul_mont
+                (MIN_LIMBS, MOD_FALLBACK, cpu::Features) => bn_mul_mont_fallback
             })
         }
     }
@@ -195,19 +195,19 @@ cfg_if! {
             target_arch = "x86_64")))] {
 
         // TODO: Stop calling this from C and un-export it.
-        #[cfg(not(target_arch = "x86"))]
-        prefixed_export! {
-            unsafe extern "C" fn bn_mul_mont(
-                r: *mut Limb,
-                a: *const Limb,
-                b: *const Limb,
-                n: *const Limb,
-                n0: &N0,
-                num_limbs: c::NonZero_size_t,
-            ) {
-                unsafe { bn_mul_mont_fallback(r, a, b, n, n0, num_limbs) }
-            }
-        }
+        // #[cfg(not(target_arch = "x86"))]
+        // prefixed_export! {
+        //     unsafe extern "C" fn bn_mul_mont(
+        //         r: *mut Limb,
+        //         a: *const Limb,
+        //         b: *const Limb,
+        //         n: *const Limb,
+        //         n0: &N0,
+        //         num_limbs: c::NonZero_size_t,
+        //     ) {
+        //         unsafe { bn_mul_mont_fallback(r, a, b, n, n0, num_limbs) }
+        //     }
+        // }
 
         #[cfg_attr(target_arch = "x86", cold)]
         #[cfg_attr(target_arch = "x86", inline(never))]
