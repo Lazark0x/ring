@@ -886,6 +886,7 @@ fn prefix_all_symbols(pp: char, prefix_prefix: &str, prefix: &str) -> String {
         ("ecp_nistz256_ord_sqr_mont", "p256_scalar_sqr_rep_mont"),
         ("ecp_nistz256_mul_mont", "p256_mul_mont"),
         ("ecp_nistz256_sqr_mont", "p256_sqr_mont"),
+        ("bn_mul_mont", "bn_mul_mont_fallback"),
     ];
 
     static SYMBOLS_TO_PREFIX: &[&str] = &[
@@ -923,7 +924,6 @@ fn prefix_all_symbols(pp: char, prefix_prefix: &str, prefix: &str) -> String {
         "aesni_gcm_encrypt",
         "bn_from_montgomery_in_place",
         "bn_gather5",
-        "bn_mul_mont",
         "bn_mul_mont_nohw",
         "bn_mul4x_mont",
         "bn_mulx4x_mont",
