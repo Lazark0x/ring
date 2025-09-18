@@ -89,22 +89,33 @@ macro_rules! prefixed_extern {
     target_arch = "x86_64"
 )))]
 macro_rules! prefixed_export {
-    // A function.
+    // Функция.
     {
         $( #[$meta:meta] )*
         $vis:vis unsafe extern "C"
         fn $name:ident ( $( $arg_pat:ident : $arg_ty:ty ),* $(,)? ) $body:block
     } => {
-        prefixed_item! {
-            export_name
-            $name
-            {
-                $( #[$meta] )*
-                $vis unsafe extern "C" fn $name ( $( $arg_pat : $arg_ty ),* ) $body
-            }
-        }
+        $( #[$meta] )*
+        $vis unsafe extern "C" fn $name ( $( $arg_pat : $arg_ty ),* ) $body
     };
 }
+// macro_rules! prefixed_export {
+//     // A function.
+//     {
+//         $( #[$meta:meta] )*
+//         $vis:vis unsafe extern "C"
+//         fn $name:ident ( $( $arg_pat:ident : $arg_ty:ty ),* $(,)? ) $body:block
+//     } => {
+//         prefixed_item! {
+//             export_name
+//             $name
+//             {
+//                 $( #[$meta] )*
+//                 $vis unsafe extern "C" fn $name ( $( $arg_pat : $arg_ty ),* ) $body
+//             }
+//         }
+//     };
+// }
 
 macro_rules! prefixed_item {
     {
