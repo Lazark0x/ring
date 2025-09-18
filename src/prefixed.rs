@@ -22,6 +22,24 @@ macro_rules! prefix {
     };
 }
 
+macro_rules! prefixed_extern_no_ffi {
+    // Functions.
+    {
+        $(
+            $( #[$meta:meta] )*
+            $vis:vis fn $name:ident ( $( $arg_pat:ident : $arg_ty:ty ),* $(,)? )
+            $( -> $ret_ty:ty )?;
+        )+
+    } => {
+        extern "C" {
+            $(
+                $( #[$meta] )*
+                $vis fn $name ( $( $arg_pat : $arg_ty ),* ) $( -> $ret_ty )?;
+            )+
+        }
+    };
+}
+
 macro_rules! prefixed_extern {
     // Functions.
     {
