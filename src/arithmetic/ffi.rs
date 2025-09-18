@@ -48,7 +48,7 @@ macro_rules! bn_mul_mont_ffi {
     ( $in_out:expr, $n:expr, $n0:expr, $cpu:expr,
       unsafe { ($MIN_LEN:expr, $MOD_LEN:expr, $Cpu:ty) => $f:ident }) => {{
         use crate::{c, limb::Limb};
-        prefixed_extern! {
+        prefixed_extern_no_ffi! {
             // `r` and/or 'a' and/or 'b' may alias.
             fn $f(
                 r: *mut Limb,
