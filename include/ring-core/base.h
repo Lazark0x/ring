@@ -17,7 +17,7 @@
 
 #if defined(__wasm__)
   #undef bn_mul_mont
-  #define bn_mul_mont __ring_internal_bn_mul_mont
+  #define bn_mul_mont bn_mul_mont_fallback
 #endif
 
 // This file should be the first included by all BoringSSL headers.
