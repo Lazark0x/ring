@@ -44,6 +44,7 @@ const _MAX_LIMBS_ADDRESSES_MEMORY_SAFETY_ISSUES: () = {
     assert!(MAX_LIMBS <= usize_from_u32(u32::MAX));
 };
 
+#[cfg(not(target_arch = "wasm32"))]
 macro_rules! bn_mul_mont_ffi {
     ( $in_out:expr, $n:expr, $n0:expr, $cpu:expr,
       unsafe { ($MIN_LEN:expr, $MOD_LEN:expr, $Cpu:ty) => $f:ident }) => {{
@@ -62,6 +63,27 @@ macro_rules! bn_mul_mont_ffi {
         unsafe {
             crate::arithmetic::ffi::bn_mul_mont_ffi::<$Cpu, { $MIN_LEN }, { $MOD_LEN }>(
                 $in_out, $n, $n0, $cpu, $f,
+            )
+        }
+    }};
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+macro_rules! bn_mul_mont_ffi {
+    ( $in_out:expr, $n:expr, $n0:expr, $cpu:expr,
+      unsafe { ($MIN_LEN:expr, $MOD_LEN:expr, $Cpu:ty) => $f:ident }) => {{
+        use crate::{c, limb::Limb};
+        let f_ptr: unsafe extern "C" fn(
+            r: *mut Limb,
+            a: *const Limb,
+            b: *const Limb,
+            n: *const Limb,
+            n0: &N0,
+            len: c::NonZero_size_t,
+        ) = $f;
+        unsafe {
+            crate::arithmetic::ffi::bn_mul_mont_ffi::<$Cpu, { $MIN_LEN }, { $MOD_LEN }>(
+                $in_out, $n, $n0, $cpu, f_ptr,
             )
         }
     }};
