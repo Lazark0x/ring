@@ -397,6 +397,7 @@ fn ring_build_rs_main(c_root_dir: &Path, core_name_and_version: &str) {
         &out_dir,
         core_name_and_version,
     );
+    build_wasm_shims(&target, c_root_dir, &generated_dir);
     emit_rerun_if_changed()
 }
 
@@ -534,6 +535,19 @@ fn build_c_code(
         "cargo:rustc-link-search=native={}",
         out_dir.to_str().expect("Invalid path")
     );
+}
+
+fn build_wasm_shims(target: &Target, c_root_dir: &Path, include_dir: &Path) {
+    if target.arch != WASM32 {
+        return;
+    }
+    let shim = c_root_dir.join("crypto").join("bn_mul_mont_shim.c");
+    let mut c = new_build(target, c_root_dir, include_dir);
+    c.file(shim);
+    let _ = c.flag("-fvisibility=hidden");
+    let _ = c.cargo_metadata(false);
+    c.compile("ring_wasm_shims");
+    println!("cargo:rustc-link-lib=static=ring_wasm_shims");
 }
 
 fn new_build(target: &Target, c_root_dir: &Path, include_dir: &Path) -> cc::Build {
