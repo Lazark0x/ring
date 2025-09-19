@@ -195,7 +195,7 @@ cfg_if! {
             target_arch = "x86_64")))] {
 
         // TODO: Stop calling this from C and un-export it.
-        #[cfg(not(target_arch = "x86"))]
+        #[cfg(not(any(target_arch = "x86", target_arch = "wasm32")))]
         prefixed_export! {
             unsafe extern "C" fn bn_mul_mont(
                 r: *mut Limb,
@@ -207,6 +207,19 @@ cfg_if! {
             ) {
                 unsafe { bn_mul_mont_fallback(r, a, b, n, n0, num_limbs) }
             }
+        }
+
+        #[cfg(target_arch = "wasm32")]
+        #[no_mangle]
+        unsafe extern "C" fn __ring_bn_mul_mont_impl(
+            r: *mut Limb,
+            a: *const Limb,
+            b: *const Limb,
+            n: *const Limb,
+            n0: &N0,
+            num_limbs: c::NonZero_size_t,
+        ) {
+            unsafe { bn_mul_mont_fallback(r, a, b, n, n0, num_limbs) }
         }
 
         #[cfg_attr(target_arch = "x86", cold)]
