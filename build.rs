@@ -541,7 +541,7 @@ fn build_wasm_shims(target: &Target, c_root_dir: &Path, include_dir: &Path) {
     if target.arch != WASM32 {
         return;
     }
-    let shim = c_root_dir.join("crypto").join("bn_mul_mont_shim.c");
+    let shim = c_root_dir.join("crypto").join("fipsmodule").join("bn").join("wasm_shim.c");
     let mut c = new_build(target, c_root_dir, include_dir);
     c.file(shim);
     let _ = c.flag("-fvisibility=hidden");
