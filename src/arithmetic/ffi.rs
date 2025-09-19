@@ -68,7 +68,7 @@ macro_rules! bn_mul_mont_ffi {
     }};
 }
 
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(target_arch = "wasm32")]
 macro_rules! bn_mul_mont_ffi {
     ( $in_out:expr, $n:expr, $n0:expr, $cpu:expr,
       unsafe { ($MIN_LEN:expr, $MOD_LEN:expr, $Cpu:ty) => $f:ident }) => {{
