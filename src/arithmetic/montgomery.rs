@@ -182,7 +182,7 @@ pub(super) fn limbs_mul_mont(
             // FFI wrapper defined below, so that Rust and C code both go
             // through `bn_mul_mont`.
             bn_mul_mont_ffi!(in_out, n, n0, cpu, unsafe {
-                (MIN_LIMBS, MOD_FALLBACK, cpu::Features) => bn_mul_mont
+                (MIN_LIMBS, MOD_FALLBACK, cpu::Features) => bn_mul_mont_fallback
             })
         }
     }
