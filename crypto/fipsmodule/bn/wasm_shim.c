@@ -4,13 +4,6 @@
 #include "../../limbs/limbs.h"
 #include "../../limbs/limbs.inl"
 
-// Public prefixed name expected by C code (hidden, so it won't be exported).
-__attribute__((visibility("hidden")))
-void bn_mul_mont(BN_ULONG *rp, const BN_ULONG *ap, const BN_ULONG *bp,
-                 const BN_ULONG *np, const BN_ULONG *n0, size_t num) {
-    bn_mul_mont_fallback(rp, ap, bp, np, n0, num);
-};
-
 // crypto/fipsmodule/bn/bn_mul_mont_fallback.c
 // Fallback Montgomery multiplication (CIOS) for ring/boringssl BN.
 // r = a * b * R^{-1} mod n, where R = 2^BN_BITS2, n is odd.
@@ -153,3 +146,10 @@ void bn_mul_mont_fallback(BN_ULONG *rp,
     rp[i] = T[i];
   }
 }
+
+// Public prefixed name expected by C code (hidden, so it won't be exported).
+__attribute__((visibility("hidden")))
+void bn_mul_mont(BN_ULONG *rp, const BN_ULONG *ap, const BN_ULONG *bp,
+                 const BN_ULONG *np, const BN_ULONG *n0, size_t num) {
+    bn_mul_mont_fallback(rp, ap, bp, np, n0, num);
+};
