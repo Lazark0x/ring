@@ -195,7 +195,8 @@ cfg_if! {
             target_arch = "x86_64")))] {
 
         // TODO: Stop calling this from C and un-export it.
-        #[cfg(not(target_arch = "x86"))]
+        // wasm32 uses native C implementation, so don't export from Rust
+        #[cfg(all(not(target_arch = "x86"), not(target_arch = "wasm32")))]
         prefixed_export! {
             unsafe extern "C" fn bn_mul_mont(
                 r: *mut Limb,

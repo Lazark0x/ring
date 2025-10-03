@@ -1,0 +1,117 @@
+# Makefile for wasm32 Montgomery multiplication testing
+# Copyright 2024-2025 Brian Smith.
+
+.PHONY: all build test verify clean help
+
+# Default target
+all: build test
+
+help:
+	@echo "Available targets:"
+	@echo "  all          - Build and test (default)"
+	@echo "  build        - Build for wasm32-unknown-unknown"
+	@echo "  test         - Run all tests"
+	@echo "  test-rust    - Run Rust tests only"
+	@echo "  test-node    - Run tests in Node.js"
+	@echo "  test-browser - Run tests in browser (requires wasm-pack)"
+	@echo "  verify       - Run full verification suite"
+	@echo "  clean        - Clean build artifacts"
+	@echo "  install-deps - Install required dependencies"
+
+# Install dependencies
+install-deps:
+	@echo "Installing wasm32 target..."
+	rustup target add wasm32-unknown-unknown
+	@echo "Installing wasm-pack..."
+	cargo install wasm-pack || true
+	@echo "Installing wasm-bindgen-cli..."
+	cargo install wasm-bindgen-cli || true
+
+# Build for wasm32
+build:
+	@echo "Building for wasm32-unknown-unknown..."
+	cargo build --target wasm32-unknown-unknown --release
+
+# Build debug version
+build-debug:
+	@echo "Building debug version for wasm32..."
+	RUSTFLAGS="-g" cargo build --target wasm32-unknown-unknown
+
+# Run all tests
+test: test-rust
+
+# Run Rust tests
+test-rust:
+	@echo "Running Rust tests for wasm32..."
+	cargo test --target wasm32-unknown-unknown
+
+# Run specific Montgomery test
+test-montgomery:
+	@echo "Running Montgomery multiplication tests..."
+	cargo test --target wasm32-unknown-unknown --test bn_mul_mont_wasm32_test
+
+# Run tests in Node.js
+test-node:
+	@echo "Running tests in Node.js..."
+	wasm-pack test --node
+
+# Run tests in browser (headless)
+test-browser:
+	@echo "Running tests in headless browser..."
+	wasm-pack test --headless --firefox || \
+	wasm-pack test --headless --chrome
+
+# Run full verification
+verify:
+	@echo "Running full verification suite..."
+	./scripts/verify_wasm32_montgomery.sh
+
+# Check that implementation is included
+check-symbols:
+	@echo "Checking for bn_mul_mont symbol..."
+	@find target/wasm32-unknown-unknown -name "*.wasm" -type f | while read wasm; do \
+		echo "Checking $$wasm..."; \
+		wasm-objdump -x "$$wasm" | grep -i "bn_mul_mont" || true; \
+	done
+
+# Inspect WASM output
+inspect:
+	@echo "Inspecting WASM binary..."
+	@find target/wasm32-unknown-unknown/release -name "*.wasm" -type f | head -1 | xargs wasm-objdump -x | less
+
+# Clean build artifacts
+clean:
+	@echo "Cleaning wasm32 build artifacts..."
+	cargo clean --target wasm32-unknown-unknown
+	rm -rf target/wasm32-unknown-unknown
+
+# Clippy for wasm32
+clippy:
+	cargo clippy --target wasm32-unknown-unknown -- -D warnings
+
+# Format check
+fmt:
+	cargo fmt --all -- --check
+
+# Documentation
+doc:
+	@echo "Building documentation..."
+	cargo doc --target wasm32-unknown-unknown --no-deps --open
+
+# Benchmark (if available)
+bench:
+	@echo "Running benchmarks..."
+	cargo test --target wasm32-unknown-unknown --test bn_mul_mont_wasm32_test -- --ignored --nocapture
+
+# CI-style complete check
+ci: fmt clippy build test verify
+	@echo "All CI checks passed!"
+
+# Size analysis
+size:
+	@echo "Analyzing WASM binary size..."
+	@find target/wasm32-unknown-unknown/release -name "*.wasm" -type f | while read wasm; do \
+		echo "$$wasm: $$(du -h $$wasm | cut -f1)"; \
+		wasm-opt --version > /dev/null 2>&1 && wasm-opt -O3 "$$wasm" -o "$${wasm}.opt" && \
+		echo "Optimized: $$(du -h $${wasm}.opt | cut -f1)" || true; \
+	done
